@@ -12,7 +12,7 @@ ui <- fluidPage(theme = shinytheme("united"),
                   tabPanel("DNA",
                            sidebarPanel(
                              tags$h3("Input:"),
-                             sliderInput("n_bases_dna","Choose a number of bases", 0, 99, 12, step = 3)
+                             sliderInput("n_bases_dna","Choose a number of bases", 3, 99, 12, step = 3)
                              
                            ),
                            mainPanel(
@@ -29,7 +29,7 @@ ui <- fluidPage(theme = shinytheme("united"),
                   tabPanel("RNA", 
                            sidebarPanel(
                              tags$h3("Input:"),
-                             sliderInput("n_bases_rna","Choose a number of bases", 0, 99, 12, step = 3)
+                             sliderInput("n_bases_rna","Choose a number of bases", 3, 99, 12, step = 3)
                            ),
                            mainPanel(
                              h1("Result"),
