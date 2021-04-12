@@ -18,11 +18,14 @@ ui <- fluidPage(theme = shinytheme("united"),
                            mainPanel(
                              h1("Result"),
                              h3("Randomly generated bases"),
-                             textOutput("raw_bases_dna")
-                             
+                             verbatimTextOutput("raw_bases_dna"),
+                             h3("Complement"),
+                             verbatimTextOutput("complement_dna"),
+                             h3("Translation"),
+                             verbatimTextOutput("translated_dna")
                            )
                            
-                  ), # Navbar 1, tabPanel
+                  ),
                   tabPanel("RNA", 
                            sidebarPanel(
                              tags$h3("Input:"),
@@ -31,8 +34,9 @@ ui <- fluidPage(theme = shinytheme("united"),
                            mainPanel(
                              h1("Result"),
                              h3("Randomly generated bases"),
-                             verbatimTextOutput("raw_bases_dna")
-                             
+                             verbatimTextOutput("raw_bases_rna"),
+                             h3("Translation"),
+                             verbatimTextOutput("translated_rna")
                            )
                   )
                 ) # navbarPage
@@ -48,6 +52,12 @@ complement <- function(dna){
 
 random_dna <- function(l){
   nucleotides <- sample(c("A", "T", "G", "C"), size = l, replace = TRUE)
+  dna = paste0(nucleotides, collapse = "")
+  return(dna)
+}
+
+random_rna <- function(l){
+  nucleotides <- sample(c("A", "U", "G", "C"), size = l, replace = TRUE)
   dna = paste0(nucleotides, collapse = "")
   return(dna)
 }
@@ -81,11 +91,54 @@ dna_codons_to_aa <- function(codons){
   return(aa)
 }
 
+rna_codons_to_aa <- function(codons){ 
+  std_code_table <- c("UUU" = "F", "UCU" = "S",
+"UAU" = "Y", "UGU" = "C", "UUC" = "F", "UCC" = "S", "UAC" = "Y", "UGC" = "C",
+"UUA" = "L", "UCA" = "S", "UAA" = "*", "UGA" = "*", "UUG" = "L", "UCG" = "S",
+"UAG" = "*", "UGG" = "W", "CUU" = "L", "CCU" = "P", "CAU" = "H", "CGU" = "R", 
+"CUC" = "L", "CCC" = "P", "CAC" = "H", "CGC" = "R", "CUA" = "L", "CCA" = "P",
+"CAA" = "Q", "CGA" = "R", "CUG" = "L", "CCG" = "P", "CAG" = "Q", "CGG" = "R",
+"AUU" = "I", "ACU" = "T", "AAU" = "N", "AGU" = "S", "AUC" = "I", "ACC" = "T",
+"AAC" = "N", "AGC" = "S", "AUA" = "I", "ACA" = "T", "AAA" = "K", "AGA" = "R",
+"AUG" = "M", "ACG" = "T", "AAG" = "K", "AGG" = "R", "GUU" = "V", "GCU" = "A",
+"GAU" = "D", "GGU" = "G", "GUC" = "V", "GCC" = "A", "GAC" = "D", "GGC" = "G",
+"GUA" = "V", "GCA" = "A", "GAA" = "E", "GGA" = "G", "GUG" = "V", "GCG" = "A",
+"GAG" = "E", "GGG" = "G") 
+  aa <- paste0(std_code_table[codons], collapse = "")
+  return(aa)
+}  
+
 # Define server function  
 server <- function(input, output) {
+  
+  dna <- reactive({random_dna(input$n_bases_dna)})
+  
   output$raw_bases_dna <- renderText({
-    print(random_dna(input$n_bases_dna))
+    print(dna())
     })
+
+  comp <- reactive({complement(dna())})
+  
+  output$complement_dna <- renderText({
+    print(comp())
+  })
+  
+  output$translated_dna <- renderText({
+    print(dna_codons_to_aa(mk_codons(comp())))
+  })
+  
+  
+  rna <- reactive({random_rna(input$n_bases_rna)})
+  
+  output$raw_bases_rna <- renderText({
+    print(rna())
+  })
+  
+  output$translated_rna <- renderText({
+    print(rna_codons_to_aa(mk_codons(rna())))
+  })
+  
+
 } # server
 
 
